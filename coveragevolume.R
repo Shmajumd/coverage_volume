@@ -42,8 +42,8 @@ coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar
     dem.res <- distGeo(p1 = c(DEM.data.frame$lon[1],DEM.data.frame$lat[1]),p2 = c(DEM.data.frame$lon[2],DEM.data.frame$lat[1]))
     
   #For every element in dem.data.filter, determine height of column, multiply by dem.res squared to get volume of column
-    DEM.data.frame$radtop <- tan(radar.angle.top) * DEM.data.frame$disttoradar + radar.z
-    DEM.data.frame$radbot <- tan(radar.angle.bottom) * DEM.data.frame$disttoradar + radar.z
+    DEM.data.frame$radtop <- tan(radar.angle.top * pi/180) * DEM.data.frame$disttoradar + radar.z
+    DEM.data.frame$radbot <- tan(radar.angle.bottom * pi/180) * DEM.data.frame$disttoradar + radar.z
     DEM.data.frame$height <- ifelse(DEM.data.frame$elev > DEM.data.frame$radbot, DEM.data.frame$radtop - DEM.data.frame$elev, DEM.data.frame$radtop - DEM.data.frame$radbot) # m
   #what if elev > radtop? 
     DEM.data.frame$height <- ifelse(DEM.data.frame$height < 0, 0, DEM.data.frame$height)
