@@ -1,5 +1,10 @@
 #Function for doing lots of trig.  Volume of theoretical beam coverage with ground elevation taken into account.  
+<<<<<<< HEAD
+#This should show up on GitHub now
+#Here is another change after that stupid error
+=======
 #Test commit
+>>>>>>> 022555d8d180f0037996f43a6fe1ad9e0997cb92
 coveragevolume <- function(){
   #get prerequisites
   #if("data.table" %in% rownames(installed.packages()) == FALSE) {install.packages("data.table")}
