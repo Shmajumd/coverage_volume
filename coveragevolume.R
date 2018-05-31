@@ -1,4 +1,5 @@
 #Function for doing lots of trig.  Volume of theoretical beam coverage with ground elevation taken into account.  
+#Test commit
 coveragevolume <- function(){
   #get prerequisites
   #if("data.table" %in% rownames(installed.packages()) == FALSE) {install.packages("data.table")}
