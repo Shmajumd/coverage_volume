@@ -1,5 +1,4 @@
 #Function for doing lots of trig.  Volume of theoretical beam coverage with ground elevation taken into account.  
-#This should show up on GitHub now.  Here's an edit after making a new project.
 
 #Variable Info
   #radar.lat: latitude decimal degrees
@@ -26,13 +25,8 @@ coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar
     require(raster)
   #Store radar location as a data.frame
     parameters.data.frame <- data.frame(radar.lat,radar.lon,radar.z)
-  #Set radar specs
-    parameters.data.frame$radar.range <- radar.range
-    radar.angle.top <- radar.angle.top * pi / 180
-    parameters.data.frame$radar.angle.top <- radar.angle.top
-    radar.angle.bottom <- radar.angle.bottom * pi / 180
-    parameters.data.frame$radar.angle.bottom <- radar.angle.bottom
     #maybe make this more generic later, choose from list of radar locations, something like that.
+    
   #Read in DEM data.  
   #get some rasters, dataframe them, give them column names, add distance to radar, remove rows outside radar range
     n48w123.raster <- raster(file.path(working.directory,"SEA 13 ArcSecond DEM/n48w123/grdn48w123_13","w001001.adf"))
