@@ -1,6 +1,6 @@
 #Function for doing lots of trig.  Volume of theoretical beam coverage with ground elevation taken into account.  
 <<<<<<< HEAD
-#This should show up on GitHub now
+#This should show up on GitHub now.  Here's an edit after making a new project.
 #Here is another change after that stupid error
 =======
 #Test commit
