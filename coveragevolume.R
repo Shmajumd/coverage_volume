@@ -10,7 +10,7 @@
 #DEM Info
   #https://viewer.nationalmap.gov/basic/
 
-coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar.z = 117,radar.range = 7000, radar.angle.top = 11, radar.angle.bottom = 0){
+coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar.z = 117,radar.range = 25, radar.angle.top = 11, radar.angle.bottom = 0){
   #Set working directory
     working.directory<-getwd()
   #Get Prerequisites
@@ -39,24 +39,30 @@ coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar
     #DEM.data.frame <- rbind(n48w122.data.frame,n48w124.data.frame,n49w122.data.frame,n49w123.data.frame,n49w124.data.frame) ##If more than one is needed.
     DEM.data.frame <- n48w123.data.frame
   #Determine DEM resolution
-    dem.res <- distGeo(p1 = c(DEM.data.frame$lon[1],DEM.data.frame$lat[1]),p2 = c(DEM.data.frame$lon[2],DEM.data.frame$lat[1]))
-    
-  #For every element in dem.data.filter, determine height of column, multiply by dem.res squared to get volume of column
+    dem.lon.res <- distGeo(p1 = c(DEM.data.frame$lon[1],DEM.data.frame$lat[1]),p2 = c(DEM.data.frame$lon[2],DEM.data.frame$lat[1]))
+    dem.lat.res <- distGeo(p1 = c(DEM.data.frame$lon[1],DEM.data.frame$lat[1]),p2 = c(DEM.data.frame$lon[1],DEM.data.frame$lat[2]))
+    parameters.data.frame$latres <- dem.lat.res
+    parameters.data.frame$lonres <- dem.lon.res
+  #For every element in dem.data.filter, determine height of column, multiply by dem.lat.res and dem.lon.res
     DEM.data.frame$radtop <- tan(radar.angle.top * pi/180) * DEM.data.frame$disttoradar + radar.z
     DEM.data.frame$radbot <- tan(radar.angle.bottom * pi/180) * DEM.data.frame$disttoradar + radar.z
     DEM.data.frame$height <- ifelse(DEM.data.frame$elev > DEM.data.frame$radbot, DEM.data.frame$radtop - DEM.data.frame$elev, DEM.data.frame$radtop - DEM.data.frame$radbot) # m
   #what if elev > radtop? 
     DEM.data.frame$height <- ifelse(DEM.data.frame$height < 0, 0, DEM.data.frame$height)
   #calculate volumes
-    DEM.data.frame$vol <- DEM.data.frame$height * dem.res * dem.res # sq m
+    DEM.data.frame$vol <- DEM.data.frame$height * dem.lat.res * dem.lon.res # sq m
   #Sum element volumes in dem.data.filter?
     totalvol <- sum(DEM.data.frame$vol)
     parameters.data.frame$totalvol <- totalvol
     #coverage.vol <- sum(#dem.data.filter(vol))
   #Output interesting things
     #write.csv(coverage.vol, all parameters used)
-      write.csv(DEM.data.frame, "output.csv", row.names=FALSE)
-      write.csv(parameters.data.frame, "parameters.csv", row.names=FALSE)
+    currentDate <- Sys.Date()
+    currentTime <-Sys.time()
+    DEMfilename <- paste("DEMoutput_",currentDate,"_",currentTime,".csv",sep="")
+    PARfilename <- paste("Parameters_",currentDate,"_",currentTime,".csv",sep="")
+      write.csv(DEM.data.frame, file=DEMfilename, row.names=FALSE)
+      write.csv(parameters.data.frame, PARfilename, row.names=FALSE)
     #volume of a particular area?  filter dem.data.filter again and repeat
     print("all done")
 }
