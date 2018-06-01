@@ -10,7 +10,7 @@
 #DEM Info
   #https://viewer.nationalmap.gov/basic/
 
-coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar.z = 117,radar.range = 25, radar.angle.top = 11, radar.angle.bottom = 0){
+coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar.z = 117, radar.range = 5000, radar.angle.top = 11, radar.angle.bottom = 0){
   #Set working directory
     working.directory<-getwd()
   #Get Prerequisites
@@ -24,25 +24,36 @@ coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar
     require(geosphere)  
     require(raster)
   #Store radar location as a data.frame
-    parameters.data.frame <- data.frame(radar.lat,radar.lon,radar.z)
+    parameters.data.frame <- data.frame(radar.lat,radar.lon,radar.z, radar.range, radar.angle.bottom, radar.angle.top)
     #maybe make this more generic later, choose from list of radar locations, something like that.
     
   #Read in DEM data.  
-  #get some rasters, dataframe them, give them column names, add distance to radar, remove rows outside radar range
+  #get some rasters, dataframe them, give them column names, add distance to radar
     n48w123.raster <- raster(file.path(working.directory,"SEA 13 ArcSecond DEM/n48w123/grdn48w123_13","w001001.adf"))
     n48w123.data.frame <- as.data.frame(x = n48w123.raster, xy = TRUE)
     colnames(n48w123.data.frame) <- c("lon", "lat", "elev")
     n48w123.data.frame$disttoradar <- distGeo(p1 = cbind(n48w123.data.frame$lon,n48w123.data.frame$lat),p2 = c(radar.lon,radar.lat))
-    n48w123.data.frame <- subset(n48w123.data.frame, disttoradar <= radar.range)
+    #n48w123.data.frame <- subset(n48w123.data.frame, disttoradar <= radar.range)
     
   #Combine data.frames
     #DEM.data.frame <- rbind(n48w122.data.frame,n48w124.data.frame,n49w122.data.frame,n49w123.data.frame,n49w124.data.frame) ##If more than one is needed.
     DEM.data.frame <- n48w123.data.frame
+  #Find info about DEM
+    lat <- unique(DEM.data.frame$lat)
+    lon <- unique(DEM.data.frame$lon)
+    n <- length(lat)
+    o <- length(lon)  
+    min.lat <-min(lat)
+    min.lon <- max(lon)
+    min.2.lat <- -sort(-lat,partial=n-1)[n-1]
+    min.2.lon <- sort(lon,partial=n-1)[n-1]
   #Determine DEM resolution
-    dem.lon.res <- distGeo(p1 = c(DEM.data.frame$lon[1],DEM.data.frame$lat[1]),p2 = c(DEM.data.frame$lon[2],DEM.data.frame$lat[1]))
-    dem.lat.res <- distGeo(p1 = c(DEM.data.frame$lon[1],DEM.data.frame$lat[1]),p2 = c(DEM.data.frame$lon[1],DEM.data.frame$lat[2]))
+    dem.lon.res <- distGeo(p1 = c(min.lon, min.lat),p2 = c(min.2.lon,min.lat))
+    dem.lat.res <- distGeo(p1 = c(min.lon, min.lat),p2 = c(min.lon,min.2.lat))
     parameters.data.frame$latres <- dem.lat.res
     parameters.data.frame$lonres <- dem.lon.res
+  #Remove data outside of radar range  
+    DEM.data.frame <- subset(DEM.data.frame, disttoradar <= radar.range)  
   #For every element in dem.data.filter, determine height of column, multiply by dem.lat.res and dem.lon.res
     DEM.data.frame$radtop <- tan(radar.angle.top * pi/180) * DEM.data.frame$disttoradar + radar.z
     DEM.data.frame$radbot <- tan(radar.angle.bottom * pi/180) * DEM.data.frame$disttoradar + radar.z
