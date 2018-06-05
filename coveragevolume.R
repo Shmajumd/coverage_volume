@@ -10,7 +10,7 @@
 #DEM Info
   #https://viewer.nationalmap.gov/basic/
 
-coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar.z = 117, radar.range = 5000, radar.angle.top = 11, radar.angle.bottom = 0){
+coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar.z = 117, radar.range = 5000, radar.angle.top = 11, radar.angle.bottom = -11){
   #Set working directory
     working.directory<-getwd()
   #Get Prerequisites
