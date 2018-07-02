@@ -53,8 +53,13 @@ coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar
     dem.lat.res <- distGeo(p1 = c(min.lon, min.lat),p2 = c(min.lon,min.2.lat))
     parameters.data.frame$latres <- dem.lat.res
     parameters.data.frame$lonres <- dem.lon.res
+  #Sum elements for checking later
+    unfiltered_elements <- nrow(DEM.data.frame)
+    parameters.data.frame$unfiltered_elements <-unfiltered_elements
   #Remove data outside of radar range  
     DEM.data.frame <- subset(DEM.data.frame, disttoradar <= radar.range)  
+  #merge with hillshade info
+    DEM.data.frame <- merge(DEM.data.frame, aglraster2.data.frame, by=c("lon","lat"))
   #For every element in dem.data.filter, determine height of column, multiply by dem.lat.res and dem.lon.res
     DEM.data.frame$radtop <- tan(radar.angle.top * pi/180) * DEM.data.frame$disttoradar + radar.z
     DEM.data.frame$radbot <- tan(radar.angle.bottom * pi/180) * DEM.data.frame$disttoradar + radar.z
@@ -64,6 +69,8 @@ coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar
   #calculate volumes
     DEM.data.frame$vol <- DEM.data.frame$height * dem.lat.res * dem.lon.res # sq m
   #Sum element volumes in dem.data.filter?
+    totalelements <- nrow(DEM.data.frame)
+    parameters.data.frame$totalelements <-totalelements
     totalvol <- sum(DEM.data.frame$vol)
     parameters.data.frame$totalvol <- totalvol
     #coverage.vol <- sum(#dem.data.filter(vol))
