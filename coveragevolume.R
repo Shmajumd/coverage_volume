@@ -23,6 +23,8 @@ coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar
     require(bit64)
     require(geosphere)  
     require(raster)
+    require(MASS)
+    require(parallel)
   #Store radar location as a data.frame
     parameters.data.frame <- data.frame(radar.lat,radar.lon,radar.z, radar.range, radar.angle.bottom, radar.angle.top)
     #maybe make this more generic later, choose from list of radar locations, something like that.
@@ -53,7 +55,17 @@ coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar
     parameters.data.frame$latres <- dem.lat.res
     parameters.data.frame$lonres <- dem.lon.res
   #Remove data outside of radar range  
-    DEM.data.frame <- subset(DEM.data.frame, disttoradar <= radar.range)  
+    DEM.data.frame <- subset(DEM.data.frame, disttoradar <= radar.range)
+  
+  #Load radar data and calculate track densities
+    setwd(file.path(working.directory, "Radar_Data"))
+    filelist<-list.files(pattern="\\.csv$")
+    filelist<-sample(x = filelist,size = 5,replace = F) ###For testing, only use a smallish sample of the data. Comment out when doing a full run.
+    numCores<- detectCores()-1  
+    datalist<-mclapply(filelist,fread,mc.cores = numCores) #faster if loading multiple CSV files
+    #datalist<-lapply(filelist,fread)
+    data<-rbindlist(datalist)
+    
   #For every element in dem.data.filter, determine height of column, multiply by dem.lat.res and dem.lon.res
     DEM.data.frame$radtop <- tan(radar.angle.top * pi/180) * DEM.data.frame$disttoradar + radar.z
     DEM.data.frame$radbot <- tan(radar.angle.bottom * pi/180) * DEM.data.frame$disttoradar + radar.z
