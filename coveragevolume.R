@@ -65,6 +65,9 @@ coveragevolume <- function(radar.lat = 47.451973, radar.lon = -122.315776, radar
     datalist<-mclapply(filelist,fread,mc.cores = numCores) #faster if loading multiple CSV files
     #datalist<-lapply(filelist,fread)
     data<-rbindlist(datalist)
+  #Calculate density
+    dens <- kde2d(x = data$Longitude,y = data$Latitude,n = c(100,100))
+    r.dens <- raster(dens)
     
   #For every element in dem.data.filter, determine height of column, multiply by dem.lat.res and dem.lon.res
     DEM.data.frame$radtop <- tan(radar.angle.top * pi/180) * DEM.data.frame$disttoradar + radar.z
